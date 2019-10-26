@@ -2,7 +2,19 @@ import React, { useState } from "react";
 import "./App.css";
 import createReactClass from "create-react-class";
 
+const useCustomHook = () => {
+  const min = 30;
+  const max = 100;
+  const randam = () => Math.floor(Math.random() * (max + 1 - min)) + min;
+  const [lineLength, setLineLength] = useState(randam());
+  const text = `長さ ${lineLength} cmの正方形の面積は ${lineLength *
+    2} 平方ｃｍです`;
+  const resetLineLength = () => setLineLength(randam());
+  return { text, resetLineLength };
+};
+
 const App: React.FC = () => {
+  const { text, resetLineLength } = useCustomHook();
   return (
     <div className="App">
       <h1>React Components</h1>
@@ -28,6 +40,10 @@ const App: React.FC = () => {
         )}
       />
       <hr />
+      <FunctionalComponent countA={2} countB={20} propsOnlyValue={1000}>
+        {text}
+      </FunctionalComponent>
+      <button onClick={resetLineLength}>Reset!</button>
     </div>
   );
 };
@@ -99,17 +115,29 @@ class ClassComponent extends React.Component<Props, State> {
     this.setState(state => ({ ...state, countB: state.countB + 10 }));
   }
 
+  didMountHandler() {
+    //hogehoge
+  }
+
+  componentDidMount() {
+    console.log("レンダリングされました!");
+  }
+
+  componentWillMount() {
+    console.log("レンダリングされます!");
+  }
+
   render() {
     return (
       <div>
         <h2>This is ClassComponent</h2>
         <div>
-          countA: {this.state.countA}{" "}
+          countA: {this.state.countA}
           <button onClick={this.onClickA.bind(this)}>Click!</button>
         </div>
 
         <div>
-          countB: {this.state.countB}{" "}
+          countB: {this.state.countB}
           <button onClick={this.onClickB.bind(this)}>Click!</button>
         </div>
         <div>propsOnlyValue: {this.props.propsOnlyValue}</div>
@@ -209,8 +237,8 @@ const StatelessFunctionalComponent: React.FC<Props> = props => (
 // 複数利用
 // https://github.com/acdlite/recompose/blob/master/docs/API.md#compose
 const withHigherOrder: (
-  SomeComponent: React.ComponentClass<Props, State>,
-  props: Props
+  SomeComponent,
+  props
 ) => React.ComponentClass = SomeComponent =>
   class extends React.Component<Props, { text: string }> {
     constructor(props) {
